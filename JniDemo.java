@@ -6,17 +6,19 @@ public class JniDemo{
 		System.loadLibrary("native");
 	}
 
-	public native int[] hello(int[] args);
+	public native String hello(String args);
 
 	public static void main(String args[]){
 		JniDemo jniDemo = new JniDemo();
-		int[] a = {1,2,3};
-		int[] b = null;
-		
-		b = jniDemo.hello(a);
-		for(int i = 0; i < b.length; i++){
-			System.out.println(b[i]);
+		String jStr = "this is java";
+		String cStr = null;
+		cStr = jniDemo.hello(jStr);
+		if(cStr != null){
+			System.out.println(cStr);
+		} else {
+			System.out.println("发生错误 null");
 		}
+			
 	}
 
 }

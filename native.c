@@ -10,54 +10,26 @@ typedef struct {
     void *fnPtr;          /* C语言实现的本地函数 */
 } JNINativeMethod;
 #endif
-
-jintArray c_hello(JNIEnv *env, jobject cls, jintArray arr)
+int cnt = 0;
+jstring JNICALL c_hello(JNIEnv *env, jobject cls, jstring str)
 {
-	jint *carr;
-	jint *oarr;
-	jintArray rarr;
+	const jbyte *cstr;
 	
-	jint i, n = 0;
-	carr = (*env)->GetIntArrayElements(env, arr, NULL);
-	if (carr == NULL) {
-		return 0; /* exception occurred */
-	}
-
-	n = (*env)->GetArrayLength(env, arr);
-	oarr = malloc(sizeof(jint) * n);
-	if (oarr == NULL)
+	cstr = (*env)->GetStringUTFChars(env, str, NULL);
+	if(cstr == NULL)
 	{
-		(*env)->ReleaseIntArrayElements(env, arr, carr, 0);
-		return 0;
+		return NULL;
 	}
-
-	for (i = 0; i < n; i++)
-	{
-		oarr[i] = carr[n-1-i];
-	}
+	cnt++;
+	printf("get string from java: %s,%d\n", cstr,cnt);
+	(*env)->ReleaseStringUTFChars(env, str, cstr);
 	
-	(*env)->ReleaseIntArrayElements(env, arr, carr, 0);
-
-	/* create jintArray */
-	rarr = (*env)->NewIntArray(env, n);
-	if (rarr == NULL)
-	{
-		return 0;
-	}
-
-	(*env)->SetIntArrayRegion(env, rarr, 0, n, oarr);
-	free(oarr);
-	
-	return rarr;
+	return (*env)->NewStringUTF(env, "return from c, haha! "); 
 }
 
-
 static const JNINativeMethod methods[] = {
-	{"hello", "([I)[I", (void *)c_hello},
+	{"hello", "(Ljava/lang/String;)Ljava/lang/String;", (void *)c_hello},
 };
-
-
-
 
 /* System.loadLibrary */
 JNIEXPORT jint JNICALL
